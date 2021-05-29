@@ -1,6 +1,6 @@
 Vaccinated <- read.csv(url("https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/vaccinations.csv"))
-
-
+# 
+library(dplyr)
 # DATA
 Data <- R6Class("Data",
                 public = list(
@@ -12,37 +12,49 @@ Data <- R6Class("Data",
                   initialize = function(total_vaccination, country) {
                     if (!missing(total_vaccination)) self$total_vaccination <- total_vaccination
                     if (!missing(country)) self$country <- country
+                    
+                    self$country_data <- self$total_vaccination %>%
+                      select(location:total_vaccinations) %>%
+                      filter(.,location == self$country)%>%fill_data()
+                    
+                    # self$country_data$date = as.Date(create_country_data$date)
+                    
+                    inds <- seq(as.Date(self$country_data$date[1]),
+                                  as.Date(self$country_data$date[length(self$country_data$date)]), by = "day")
+                    ts(self$country_data$total_vaccinations,
+                       start = c(2021, as.numeric(format(inds[1], "%j"))),
+                       frequency = 365) -> output
+                    self$ts_data <- output
+                    self$ts_data_diff <- diff(self$ts_data)
+                      
+                      
+                      
                   },
                   
-                  create_country_data = function() {
-                    if (is.data.frame(self$total_vaccination) == TRUE){
-                      self$total_vaccination %>%
-                        select(location:total_vaccinations) %>%
-                        filter(.,
-                               location == self$country) -> c_data
-                      c_data <- fill_data(c_data)
-                      c_data$date <- as.Date(c_data$date)
-                      self$country_data <- c_data
-                    }
-                    else {
-                      warning('Make sure object entered is data.frame object!')
-                    }
-                  },
-                    
-                  create_ts = function(){
-                    if (is.data.frame(self$country_data) == TRUE){
-                      inds <- seq(as.Date(self$country_data$date[1]),
-                                  as.Date(self$country_data$date[length(self$country_data$date)]), by = "day")
-                      ts(self$country_data$total_vaccinations,
-                         start = c(2021, as.numeric(format(inds[1], "%j"))),
-                         frequency = 365) -> output
-                      self$ts_data <- output
-                      self$ts_data_diff <- diff(self$ts_data)
-                    }
-                    else {
-                      warning('Make sure object entered is data.frame object!')
-                    }
-                  },                
+                  # create_country_data = 
+                  #   ifelse (is.data.frame(self$total_vaccination) == TRUE,
+                  #     (self$total_vaccination %>%
+                  #       select(location:total_vaccinations) %>%
+                  #       filter(.,
+                  #              location == self$country)%>%fill_data()),
+                  #     warning('Make sure object entered is data.frame object!')
+                  #   )
+                  # ,
+                  # create_country_data$date = as.Date(create_country_data$date),
+                  # create_ts = function(){
+                  #   if (is.data.frame(self$country_data) == TRUE){
+                  #     inds <- seq(as.Date(self$country_data$date[1]),
+                  #                 as.Date(self$country_data$date[length(self$country_data$date)]), by = "day")
+                  #     ts(self$country_data$total_vaccinations,
+                  #        start = c(2021, as.numeric(format(inds[1], "%j"))),
+                  #        frequency = 365) -> output
+                  #     self$ts_data <- output
+                  #     self$ts_data_diff <- diff(self$ts_data)
+                  #   }
+                  #   else {
+                  #     warning('Make sure object entered is data.frame object!')
+                  #   }
+                  # },                
                   
                   print_data = function(x) {
                     if (is.ts(x) == TRUE){
