@@ -1,0 +1,178 @@
+---
+title: "Covid-19 Vaccination Shiny App"
+author: "Anna Sikora, Alparslan Erol, Tesfahun Tegene Boshe"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### Introduction
+
+This markdown is created for the purpose of initial data analysis before creating an app using shiny. The purpose of the app is to create a visualization of the vaccination process around the world and the track progress. 
+
+The data used for the analysis comes from git hub page provided below:
+https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations
+
+The data consists of 12 columns:
+
+* date
+ + location
+ + iso_code
+ + total_vaccinations
+ + people_vaccinated
+ + people_fully_vaccinated
+ + daily_vaccinations_raw
+ + daily_vaccinations
+ + total_vaccinations_per_hundred
+ + people_vaccinated_per_hundred
+ + people_fully_vaccinated_per_hundred 
+ + daily_vaccinations_per_million
+ 
+### Exploratory Data Analysis
+#### Importing neccessary packages and removing scientific notation
+```{r message=FALSE, warning=FALSE}
+library(rio)
+library(e1071)   
+library(data.table)
+library(ggplot2)
+library(dplyr)
+
+options(scipen=999)
+```
+
+#### Importing the data from github and loading 
+
+```{r}
+vaccinations <- data.table(import("https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/vaccinations.csv"))
+```
+
+### Basic Data analysis
+
+#### Summary statistics
+
+```{r}
+summary(vaccinations)
+```
+
+#### Column data types
+
+```{r}
+str(vaccinations)
+```
+
+#### Removing NA's
+
+```{r}
+vaccinations <- na.omit(vaccinations)
+```
+
+#### Exploring the regions in the dataset
+
+As we can see, the world data is divided according to various criteria:
+
+* data for the whole world
+* division by continent
+* division by income level
+* division by country
+
+```{r}
+unique(vaccinations$location)
+```
+
+
+#### World results
+
+```{r}
+world <- vaccinations[location == "World"]
+```
+```{r fig.width=8, fig.height=4}
+w0<-ggplot(data = world) +
+  geom_line(aes(x=date, y=total_vaccinations),color = "blueviolet", linetype = "solid", size = 1)+
+  xlab("Date")+
+  ylab("Total vaccinations")+
+  labs(title = "Total vaccinations evolution across time")+
+  theme_update(plot.title = element_text(hjust=0.5))
+w0
+```
+
+
+```{r fig.width=8, fig.height=4}
+w1<-ggplot(data = world) +
+  geom_line(aes(x=date, y=people_vaccinated),color = "grey39", linetype = "solid", size = 1)+
+  geom_line(aes(x=date, y=people_fully_vaccinated),color = "green2", linetype = "solid", size = 1)+
+  xlab("Date")+
+  ylab("Vaccinations")+
+  labs(title = "People vaccinated vs. people fully vaccinated")+
+  theme_update(plot.title = element_text(hjust=0.5))
+w1
+```
+
+```{r fig.width=8, fig.height=4}
+w2<-ggplot(data = world) +
+  geom_line(aes(x=date, y=daily_vaccinations_per_million),color = "navyblue", linetype = "solid", size = 1)+
+  xlab("Date")+
+  ylab("Vaccinations")+
+  labs(title = "Daily vaccinations per million around the world")+
+  theme_update(plot.title = element_text(hjust=0.5))
+w2
+ 
+```
+### Results by countries 
+
+```{r, warning=FALSE}
+vaccinations <- vaccinations %>%
+  select(location, total_vaccinations, iso_code) %>%
+  filter(!location %in% c("World","Europe", "Low income", "Lower middle income", "Africa", "Asia", "European Union", "High income", "Oceania", "South America", "Upper middle income", "Australia", "North America"))
+
+data <-vaccinations[, sum(total_vaccinations), by = location]
+```
+```{r fig.width=8, fig.height=12}
+options(repr.plot.width=12,repr.plot.height=50)
+data %>%
+  ggplot(aes(x = V1, y = location)) +
+  geom_bar(aes(fill = location), position = "identity", stat = "identity", show.legend = FALSE) +
+  labs(x = "Total Vaccinations", y = "Country") +
+  labs(title = "Total vaccinations by country")+
+  theme(axis.text.y = element_text(size=6),panel.grid = element_blank())
+```
+
+### Grouping by the country's income
+
+```{r, warning=FALSE}
+vaccinations <- data.table(import("https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/vaccinations.csv"))
+
+vaccinations <- na.omit(vaccinations)
+
+income <- vaccinations %>%
+  select(location, total_vaccinations, iso_code) %>%
+  filter(location %in% c("Low income", "Lower middle income","High income", "Upper middle income"))
+```
+
+```{r fig.width=8, fig.height=5, warning=FALSE}
+options(repr.plot.width=16,repr.plot.height=12)
+income %>%
+  ggplot(aes(x = location, y = total_vaccinations)) +
+  geom_bar(aes(fill = total_vaccinations), position = "identity", stat = "identity", show.legend = FALSE) +
+  labs(x = "Income Groups", y = "Total Vaccinations") +
+  theme(panel.grid = element_blank(), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) 
+```
+
+
+### Total cases by continents
+```{r , warning=FALSE}
+continents <- vaccinations %>%
+  select(location, total_vaccinations, iso_code) %>%
+  filter(location %in% c("Europe","Africa", "Asia", "Oceania", "South America","Australia", "North America"))
+```
+
+```{r fig.width=8, fig.height=5, warning=FALSE}
+continents <-continents[, sum(total_vaccinations), by = location]
+continents <- na.omit(continents)
+
+slices <- continents$V1
+labls <- continents$location
+
+pie(slices,labels=labls,explode=0.1, col=rainbow(length(labls)),
+      main="Total vaccinations by continent ")
+```
