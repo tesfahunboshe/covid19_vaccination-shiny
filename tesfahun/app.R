@@ -1,11 +1,11 @@
-# author: Tesahun Tegene Boshe
-# date: May 2021
+# Author: Tesahun Tegene Boshe
+# Date: May 2021
 
 #set working directory
 setwd("~\\sem 2\\Advanced programming in R\\myAPP\\covid19_vaccination-shiny")
 # install the necessary packages
 requiredPackages = c("magrittr","rvest","readxl","dplyr","maps","ggplot2","reshape2","ggiraph","RColorBrewer","shiny","geojsonio",
-                     "shinythemes","shinydashboard","shinyWidgets","plotly","leaflet","data.table","scales","lattice")
+                     "shinythemes","shinydashboard","shinyWidgets","plotly","leaflet","data.table","scales","lattice","gridExtra")
 
 for(i in requiredPackages){if(!require(i,character.only = TRUE)) install.packages(i)}
 for(i in requiredPackages){if(!require(i,character.only = TRUE)) library(i,character.only = TRUE) }
@@ -129,40 +129,27 @@ ui <- bootstrapPage(
                         )),
                
                tabPanel("Forecast",
-                        fluidRow(
-                            column(3,
-                                   selectInput("Country1", "Filter by country", list_countries, "Turkey"), multiple=FALSE
-                            )
-                        ),
                         
-                        dateRangeInput("daterange2", "Enter the date range:",
-                                       start  = current_date,
-                                       end    = current_date + 365,
-                                       min    = current_date,
-                                       format = "mm/dd/yy",
-                                       separator = " - "),
+                        titlePanel("Settings"),
+                        sidebarLayout(position = "left",
+                                      
+                                      sidebarPanel(selectInput("Country1", "Filter by country", list_countries, "Turkey", multiple=FALSE),
+                                      
+                                      "Select plots",
+                                                   checkboxInput("donum1", "Time series", value = T),
+                                                   checkboxInput("donum2", "Residuals", value = F),
+                                                   sliderInput("wt1","Weight 1",min=1,max=10,value=1),
+                                                   sliderInput("wt2","Weight 2",min=1,max=10,value=1)
+                                      ),
+                                      mainPanel("Plots",
+                                                column(6,plotOutput(outputId="plotgraph", width="900px",height="500px"))
+                            ))            
                         
-                        plotOutput("ts",
-                                   click = "plot_click",
-                                   dblclick = "plot_dblclick",
-                                   hover = "plot_hover",
-                                   brush = "plot_brush"
-                                   
-                        ),
-                        plotOutput("residuals",
-                                   click = "plot_click",
-                                   dblclick = "plot_dblclick",
-                                   hover = "plot_hover",
-                                   brush = "plot_brush"
-                                   
-                        ),
-                        plotOutput("diagnostics",
-                                   click = "plot_click",
-                                   dblclick = "plot_dblclick",
-                                   hover = "plot_hover",
-                                   brush = "plot_brush"
-                                   
-                        )
+                        
+                        
+                        
+                        
+                        
                ),
                
                tabPanel("About Us",
@@ -271,18 +258,32 @@ server <- function(input, output, session) {
     })
     
     
-    output$ts <- renderPlot({
+    pt1 <- reactive({
+        if (!input$donum1) return(NULL)
         model()$plot_forecast(model_name = 'ARIMA')
     })
     
-    output$residuals <- renderPlot({
+    pt2 <- reactive({
+        if (!input$donum2) return(NULL)
         model()$plot_residual_fit()
     })
     
-    output$diagnostics <- renderPlot({
-        model()$residual_diagnostics(header = 'Residual Diagnostic Plot')
+    
+    
+    output$plotgraph = renderPlot({
+        ptlist <- list(pt1(),pt2())
+        wtlist <- c(input$wt1,input$wt2)
+        # remove the null plots from ptlist and wtlist
+        to_delete <- !sapply(ptlist,is.null)
+        ptlist <- ptlist[to_delete] 
+        wtlist <- wtlist[to_delete]
+        if (length(ptlist)==0) return(NULL)
+        
+        grid.arrange(grobs=ptlist,widths=wtlist,ncol=length(ptlist))
     })
-
+    
+    
+        
 
 }
 
