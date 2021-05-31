@@ -1,4 +1,69 @@
+# Function to fill missing values inside the data.
+fill_data <- function(x) {
+  x %>%
+    fill(total_vaccinations) -> x
+  return(x)
+}
+
+# SOURCE: https://github.com/inertia7/timeSeries_sp500_R/blob/master/src/helper_functions.R
+ggtsdiag_custom <- function(object, ts_object_name, gof.lag = 10,
+                            conf.int = TRUE,
+                            conf.int.colour = '#0000FF', conf.int.linetype = 'dashed',
+                            conf.int.fill = NULL, conf.int.alpha = 0.3,
+                            ad.colour = '#888888', ad.linetype = 'dashed', ad.size = .2,
+                            nrow = NULL, ncol = 1, ...) {
+  rs <- stats::residuals(object)
+  if (is.null(rs)) {
+    rs <- object$residuals
+  }
+  if (is.null(rs)) {
+    rs <- object$resid
+  }
+  
+  p.std <- ggplot2::autoplot(rs, na.action = stats::na.pass,
+                             ts.colour = 'turquoise4', size = 1.05) +
+    ggplot2::geom_hline(yintercept = 0,
+                        linetype = ad.linetype, size = ad.size,
+                        colour = ad.colour) +
+    labs(subtitle = '') +
+    ggplot2::ggtitle(sprintf("Residual Diagnostics for %s \nNon-Standardized Residuals",
+                             ts_object_name))
+  
+  acfobj <- stats::acf(rs, plot = FALSE, na.action = stats::na.pass)
+  p.acf <- autoplot(acfobj, conf.int = conf.int,
+                    conf.int.colour = conf.int.colour,
+                    conf.int.linetype = conf.int.linetype,
+                    conf.int.fill = conf.int.fill,
+                    conf.int.alpha = conf.int.alpha,
+                    colour = 'turquoise4', size = 1.25)
+  p.acf <- p.acf + ggplot2::ggtitle('ACF of Residuals')
+  
+  nlag <- gof.lag
+  pval <- numeric(nlag)
+  for (i in 1L:nlag) pval[i] <- stats::Box.test(rs, i, type = "Ljung-Box")$p.value
+  lb.df <- data.frame(Lag = 1L:nlag, `p value` = pval,
+                      lower = -0.05, upper = 0.05)
+  # Unnable to create column with space by above expression
+  colnames(lb.df) <- c('Lag', 'p value', 'lower', 'upper')
+  p.lb <- ggplot2::ggplot(data = lb.df, mapping = ggplot2::aes_string(x = 'Lag')) +
+    ggplot2::geom_point(mapping = ggplot2::aes_string(y = '`p value`'), na.rm = TRUE,
+                        colour = 'turquoise4') +
+    ggplot2::scale_y_continuous(limits=c(-0.1, 1)) +
+    ggplot2::ggtitle('p values for Ljung-Box statistic')
+  
+  p.lb <- ggfortify:::plot_confint(p = p.lb, data = lb.df, conf.int = conf.int,
+                                   conf.int.colour = conf.int.colour,
+                                   conf.int.linetype = conf.int.linetype,
+                                   conf.int.fill = conf.int.fill, conf.int.alpha = conf.int.alpha)
+  
+  if (is.null(ncol)) { ncol <- 0 }
+  if (is.null(nrow)) { nrow <- 0 }
+  new('ggmultiplot', plots = list(p.std, p.acf, p.lb), nrow = nrow, ncol = ncol)
+}
+
+
 # DATA
+#' @importFrom R6 R6Class
 Data <- R6Class("Data",
                 public = list(
                   total_vaccination = NULL,
@@ -43,6 +108,7 @@ Data <- R6Class("Data",
 
 
 ## PLOT
+#' @importFrom R6 R6Class
 Plot <- R6Class("Plot",
                 public = list(
                   ts_object = NA,
@@ -134,6 +200,7 @@ Plot <- R6Class("Plot",
 
 
 ## Model
+#' @importFrom R6 R6Class
 Model <- R6Class("Model",
                  public = list(
                    ts_object = NA,
@@ -162,16 +229,16 @@ Model <- R6Class("Model",
                    plot_residual_fit = function(binwidth = 10000) {
                      if (is.Arima(self$fit) == TRUE){
                        residFit <- ggplot(data=self$fit, aes(residuals(self$fit))) +
-                       geom_histogram(aes(y =..density..),
-                                      binwidth = binwidth,
-                                      col="turquoise4", fill="white") +
-                       geom_density(col="turquoise4") +
-                       theme(panel.background = element_rect(fill = "gray98"),
-                             panel.grid.minor = element_blank(),
-                             axis.line   = element_line(colour="gray"),
-                             axis.line.x = element_line(colour="gray")) +
-                       ggtitle("Model Residuals")
-
+                         geom_histogram(aes(y =..density..),
+                                        binwidth = binwidth,
+                                        col="turquoise4", fill="white") +
+                         geom_density(col="turquoise4") +
+                         theme(panel.background = element_rect(fill = "gray98"),
+                               panel.grid.minor = element_blank(),
+                               axis.line   = element_line(colour="gray"),
+                               axis.line.x = element_line(colour="gray")) +
+                         ggtitle("Model Residuals")
+                       
                        
                        return(residFit)
                      } else {
@@ -186,9 +253,9 @@ Model <- R6Class("Model",
                        } else {
                          fit_arima <- forecast(self$fit, h = h)
                          forCovid <- autoplot(fit_arima,
-                                            forc_name = model_name,
-                                            ts_object_name = ts_name,
-                                            title = "Time series")
+                                              forc_name = model_name,
+                                              ts_object_name = ts_name,
+                                              title = "Time series")
                          
                          return(forCovid)
                        }

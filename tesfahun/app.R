@@ -13,10 +13,9 @@ for(i in requiredPackages){if(!require(i,character.only = TRUE)) library(i,chara
 # import data
 countries <- read.csv("tesfahun\\countries_codes_and_coordinates.csv")
 worldcountry = geojsonio::geojson_read("tesfahun\\50m.geojson", what = "sp")
-Vaccinated <- as.data.frame(fread("https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/vaccinations.csv"))
+Vaccinated <- read.csv(url("https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/vaccinations.csv"))
 locations <- as.data.frame(fread("https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/locations.csv"))
 source("alparslan\\source.R")
-source("alparslan\\classes.R")
 
 
 Vaccinated <- merge(x = Vaccinated[ , c("location","date","daily_vaccinations")], y = locations[ , c("location", "iso_code")], by = "location", all.x=TRUE)
