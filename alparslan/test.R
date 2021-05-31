@@ -1,5 +1,5 @@
-here::here()
-source(here::here("alparslan/source.R"))
+setwd("~\\sem 2\\Advanced programming in R\\myAPP\\covid19_vaccination-shiny")
+source("alparslan/source.R")
 
 
 # LOAD DATA
@@ -47,3 +47,4 @@ model$residual_diagnostics(header = 'Residual Diagnostic Plot')
 model$plot_residual_fit()
 model$plot_forecast(model_name = 'ARIMA')
 model$get_forecast()
+

@@ -1,0 +1,14 @@
+name: tesfahun
+title:
+username:
+account: tesfahunboshe
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 4209132
+bundleId: 4660731
+url: https://tesfahunboshe.shinyapps.io/tesfahun/
+when: 1622468992.29183
+lastSyncTime: 1622468992.29183
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: 50m.geojson|aboutus.html|alparslan.png|anna.jpg|countries_codes_and_coordinates.csv|country_geoms.csv|deps.sh|gomap.js|gtag.html|style2.css|styles.css|tesfa.jpg
