@@ -11,11 +11,11 @@ for(i in requiredPackages){if(!require(i,character.only = TRUE)) install.package
 for(i in requiredPackages){if(!require(i,character.only = TRUE)) library(i,character.only = TRUE) }
 
 # import data
-countries <- read.csv("tesfahun\\countries_codes_and_coordinates.csv")
-worldcountry = geojsonio::geojson_read("tesfahun\\50m.geojson", what = "sp")
+countries <- read.csv("shiny\\countries_codes_and_coordinates.csv")
+worldcountry = geojsonio::geojson_read("shiny\\50m.geojson", what = "sp")
 Vaccinated <- read.csv(url("https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/vaccinations.csv"))
 locations <- as.data.frame(fread("https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/locations.csv"))
-source("alparslan\\source.R")
+source("package\\source.R")
 
 
 Vaccinated <- merge(x = Vaccinated[ , c("location","date","daily_vaccinations","total_vaccinations")], y = locations[ , c("location", "iso_code")], by = "location", all.x=TRUE)
@@ -90,7 +90,7 @@ list_countries <- c("All",sort(list_countries))
 names(list_countries) <- list_countries
 
 ui <- bootstrapPage(
-    tags$head(includeHTML("tesfahun\\gtag.html")),
+    tags$head(includeHTML("shiny\\gtag.html")),
     navbarPage("Vaccination", id="nav",
                theme = shinythemes::shinytheme("united"), collapsible = TRUE,
                tabPanel("Vaccination By Country",
@@ -98,8 +98,8 @@ ui <- bootstrapPage(
 
                             tags$head(
                                 # Include our custom CSS
-                                includeCSS("tesfahun\\styles.css"),
-                                includeScript("tesfahun\\gomap.js")
+                                includeCSS("shiny\\styles.css"),
+                                includeScript("shiny\\gomap.js")
                             ),
 
                             # If not using custom CSS, set height of leafletOutput to a number instead of percent
@@ -154,8 +154,8 @@ ui <- bootstrapPage(
                tabPanel("About Us",
                         titlePanel("About Us"),
                         mainPanel(
-                            includeCSS("tesfahun\\style2.css"),
-                            includeHTML("tesfahun\\aboutus.html")
+                            includeCSS("shiny\\style2.css"),
+                            includeHTML("shiny\\aboutus.html")
                         )
 
                )

@@ -1,5 +1,5 @@
 setwd("~\\sem 2\\Advanced programming in R\\myAPP\\covid19_vaccination-shiny")
-source("alparslan/source.R")
+source("package/source.R")
 
 
 # LOAD DATA
