@@ -10,6 +10,7 @@
 # install.packages("R6")
 
 # Load libraries
+library(dplyr)
 library(ggplot2)
 library(forecast)
 library(plotly)

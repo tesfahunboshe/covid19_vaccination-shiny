@@ -49,6 +49,8 @@ fill_data(x)
 ## The function is currently defined as
 function (x)
 {
+    x <- x \%>\% fill(total_vaccinations)
+    return(x)
   }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
