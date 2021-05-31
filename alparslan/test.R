@@ -1,13 +1,14 @@
 here::here()
 source(here::here("alparslan/source.R"))
-source(here::here("alparslan/classes.R"))
 
 
 # LOAD DATA
+Vaccinated <- read.csv(url("https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/vaccinations.csv"))
+
 head(Vaccinated)
 class(Vaccinated)
 
-data_tur <- Data$new(country = "Poland")
+data_tur <- Data$new(total_vaccination = Vaccinated, country = "Poland")
 
 data_tur$country
 data_tur$create_country_data()

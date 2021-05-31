@@ -1,10 +1,7 @@
-Vaccinated <- read.csv(url("https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/vaccinations.csv"))
-
-
 # DATA
 Data <- R6Class("Data",
                 public = list(
-                  total_vaccination = Vaccinated,
+                  total_vaccination = NULL,
                   country = NULL,
                   country_data = NULL,
                   ts_data = NULL,
