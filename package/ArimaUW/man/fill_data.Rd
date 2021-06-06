@@ -6,6 +6,7 @@
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Function to fill missing values inside the data.
 }
 \usage{
 fill_data(x)
@@ -45,6 +46,12 @@ fill_data(x)
 ##---- Should be DIRECTLY executable !! ----
 ##-- ==>  Define data, use random,
 ##--	or do  help(data=index)  for the standard data sets.
+
+## With dplyr package
+self$country_data <- self$total_vaccination %>%
+                      select(location:total_vaccinations) %>%
+                      filter(.,location == self$country)%>%fill_data()
+
 
 ## The function is currently defined as
 function (x)

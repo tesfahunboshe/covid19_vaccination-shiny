@@ -1,3 +1,10 @@
+# Please find the test cases how to use these 3 classes (Data, Plot, Model) with hands-on experiments
+# in the test.R file. This classes also used in out own packege. Therefore, if you install our package
+# from out project repository located in github, you can simply use these classes without any pre-condition.
+## Project Root: https://github.com/tesfahunboshe/covid19_vaccination-shiny
+## Package Root: https://github.com/tesfahunboshe/covid19_vaccination-shiny/tree/main/package/ArimaUW
+
+
 setwd("~\\sem 2\\Advanced programming in R\\myAPP\\covid19_vaccination-shiny")
 source("package/source.R")
 

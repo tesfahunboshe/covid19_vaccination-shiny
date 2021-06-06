@@ -1,3 +1,12 @@
+# Please find detailed explanations about the classes in this package in:
+# https://github.com/tesfahunboshe/covid19_vaccination-shiny/tree/main/package/classes.R file!
+
+# Please find the test cases how to use these 3 classes (Data, Plot, Model) with hands-on experiments
+# in the test.R file. This classes also used in out own packege. Therefore, if you install our package
+# from out project repository located in github, you can simply use these classes without any pre-condition.
+## Project Root: https://github.com/tesfahunboshe/covid19_vaccination-shiny
+## Package Root: https://github.com/tesfahunboshe/covid19_vaccination-shiny/tree/main/package/ArimaUW
+
 # Function to fill missing values inside the data.
 fill_data <- function(x) {
   x %>%
@@ -5,6 +14,7 @@ fill_data <- function(x) {
   return(x)
 }
 
+# This function is taken from the fiven source code by intertia7.
 # SOURCE: https://github.com/inertia7/timeSeries_sp500_R/blob/master/src/helper_functions.R
 ggtsdiag_custom <- function(object, ts_object_name, gof.lag = 10,
                             conf.int = TRUE,

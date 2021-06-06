@@ -6,6 +6,8 @@
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
+This function is taken from the fiven source code by intertia7.
+SOURCE: https://github.com/inertia7/timeSeries_sp500_R/blob/master/src/helper_functions.R
 }
 \usage{
 ggtsdiag_custom(object, ts_object_name, gof.lag = 10, conf.int = TRUE, conf.int.colour = "#0000FF", conf.int.linetype = "dashed", conf.int.fill = NULL, conf.int.alpha = 0.3, ad.colour = "#888888", ad.linetype = "dashed", ad.size = 0.2, nrow = NULL, ncol = 1, ...)
