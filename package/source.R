@@ -1,3 +1,5 @@
+# This file is used only for package imports.
+
 # install.packages("ggplot2")
 # install.packages("forecast")
 # install.packages("plotly")
@@ -22,4 +24,6 @@ library(readr)
 library(here)
 library(R6)
 library(tidyr)
+
+## HERE IS OUR OWN PACKEGE CREATED FOR THIS PROJECT
 library(ArimaUW)
